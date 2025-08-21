@@ -47,6 +47,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <label for="email">Digite o seu email cadastrado</label>
         <input type="email" id="email" name="email" required>
         <button type="submit">Enviar a Senha Temporaria</button>
+        <a href="principal.php" class="btn-voltar">Voltar</a>
     </form>
 
     <br>
