@@ -26,28 +26,28 @@ $nome_perfil = $perfil['nome_perfil'] ?? 'Perfil desconhecido';
 $permissoes = [
     // ADMINISTRADOR
     1 => [
-        "Cadastrar" => ["cadastro_usuario.php", "cadastro_perfil.php", "cadastro_cliente.php", "cadastro_fornecedor.php", "cadastro_produto.php", "cadastro_funcionario.php"],
+        "Cadastrar" => ["cadastrar_usuario.php", "cadastrar_perfil.php", "cadastrar_cliente.php", "cadastrar_fornecedor.php", "cadastrar_produto.php", "cadastrar_funcionario.php"],
         "Buscar"    => ["buscar_usuario.php", "buscar_perfil.php", "buscar_cliente.php", "buscar_fornecedor.php", "buscar_produto.php", "buscar_funcionario.php"],
         "Alterar"   => ["alterar_usuario.php", "alterar_perfil.php", "alterar_cliente.php", "alterar_fornecedor.php", "alterar_produto.php", "alterar_funcionario.php"],
         "Excluir"   => ["excluir_usuario.php", "excluir_perfil.php", "excluir_cliente.php", "excluir_fornecedor.php", "excluir_produto.php", "excluir_funcionario.php"]
     ],
     // SECRETARIA
     2 => [
-        "Cadastrar" => ["cadastro_cliente.php"],
+        "Cadastrar" => ["cadastrar_cliente.php"],
         "Buscar"    => ["buscar_cliente.php", "buscar_fornecedor.php", "buscar_produto.php"],
         "Alterar"   => ["alterar_fornecedor.php", "alterar_produto.php"],
         "Excluir"   => ["excluir_produto.php"]
     ],
     // ALMOXARIFE
     3 => [
-        "Cadastrar" => ["cadastro_fornecedor.php", "cadastro_produto.php"],
+        "Cadastrar" => ["cadastrar_fornecedor.php", "cadastrar_produto.php"],
         "Buscar"    => ["buscar_cliente.php", "buscar_fornecedor.php", "buscar_produto.php"],
         "Alterar"   => ["alterar_fornecedor.php", "alterar_produto.php"],
         "Excluir"   => ["excluir_produto.php"]
     ],
     // USUARIO
     4 => [
-        "Cadastrar" => ["cadastro_usuario.php"],
+        "Cadastrar" => ["cadastrar_usuario.php"],
         "Buscar"    => ["buscar_produto.php"],
         "Alterar"   => ["alterar_cliente.php"]
     ]
@@ -62,6 +62,7 @@ $opcoes_menu = $permissoes[$id_perfil] ?? [];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Principal</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="styles.css">
     <script src="scripts.js"></script>
 </head>
@@ -99,5 +100,6 @@ $opcoes_menu = $permissoes[$id_perfil] ?? [];
     <br>
         <br>
         <address><center>Ruan de Mello Vieira</center></address>
+    <script src="js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

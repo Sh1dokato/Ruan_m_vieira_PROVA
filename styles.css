@@ -1,7 +1,6 @@
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
-    text-align: center;
 }
 
 .login-container {
@@ -118,33 +117,23 @@ header {
     background-color: #ddd;
 }
 
-/* Centraliza o formulário na tela */
-form {
-    width: 500px; /* Define uma largura fixa */
-    margin: 50px auto; /* Centraliza na tela */
-    padding: 20px;
-    background-color: #f9f9f9; /* Fundo suave */
-    border-radius: 10px; /* Cantos arredondados */
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Sombra leve */
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centraliza os elementos dentro do formulário */
+
+form:not(.form-control):not(.btn) {
+
 }
 
 
-/* Ajusta as labels */
-label {
-    display: block; /* Mantém acima do campo */
+label:not(.form-label) {
+    display: block;
     font-weight: bold;
-    margin-bottom: 5px; /* Espaço entre label e campo */
+    margin-bottom: 5px;
 }
 
-/* Ajusta os campos de entrada */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-select {
-    width: 80%; /* Ocupa toda a largura do formulário */
+input[type="text"]:not(.form-control),
+input[type="email"]:not(.form-control),
+input[type="password"]:not(.form-control),
+select:not(.form-select) {
+    width: 80%;
     padding: 8px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
@@ -152,11 +141,11 @@ select {
     font-size: 16px;
 }
 
-/* Ajusta os botões */
-button {
+
+button:not(.btn) {
     width: 80%;
     padding: 10px;
-    background-color: #007bff; /* Azul bonito */
+    background-color: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
@@ -165,6 +154,18 @@ button {
     transition: 0.3s;
 }
 
-button:hover {
-    background-color: #0056b3; /* Azul mais escuro ao passar o mouse */
+button:not(.btn):hover {
+    background-color: #0056b3;
+}
+
+.btn-sair {
+    margin-left: 950px;
+}
+.form-control{
+    width: 100%;
+    padding: 6px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
 }

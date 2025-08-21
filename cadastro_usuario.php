@@ -15,7 +15,7 @@ if($_SERVER["REQUEST_METHOD"]=="POST"){
     $senha = password_hash ($_POST['senha'], PASSWORD_DEFAULT);
     $id_perfil = $_POST['id_perfil'];
     
-    $sql="INSERT INTO usuario(nome,email,senha,id_perfil) VALUES (:nome,:email,:senha,:id_perfil)";
+    $sql="INSERT INTO usuario (nome,email,senha,id_perfil) VALUES (:nome,:email,:senha,:id_perfil)";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':nome',$nome);
     $stmt->bindParam(':email',$email);
