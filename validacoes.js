@@ -1,54 +1,73 @@
-// Função para aplicar máscara de telefone
 function aplicarMascaraTelefone(input) {
-    let valor = input.value.replace(/\D/g, ''); // Remove tudo que não é dígito
-    
-    // Limita a 11 dígitos (padrão brasileiro)
-    if (valor.length > 11) {
-        valor = valor.substring(0, 11);
-    }
-    
-    if (valor.length <= 11) {
-        if (valor.length <= 2) {
-            valor = valor;
-        } else if (valor.length <= 6) {
-            valor = valor.replace(/(\d{2})(\d)/, '($1) $2');
-        } else if (valor.length <= 10) {
-            valor = valor.replace(/(\d{2})(\d{4})(\d)/, '($1) $2-$3');
-        } else {
-            valor = valor.replace(/(\d{2})(\d{5})(\d)/, '($1) $2-$3');
-        }
-    }
-    
-    input.value = valor;
+    let v = input.value.replace(/\D/g, '').slice(0, 11);
+    input.value = v.replace(/^(\d{2})(\d{4,5})(\d{0,4}).*/, (_, ddd, p1, p2) =>
+        `(${ddd}) ${p1}${p2 ? '-' + p2 : ''}`);
 }
 
-// Função para permitir apenas números no campo de telefone
-function permitirApenasNumerosTelefone(input) {
-    // Remove caracteres não numéricos
-    let valor = input.value.replace(/\D/g, '');
-    
-    // Limita a 11 dígitos (padrão brasileiro)
-    if (valor.length > 11) {
-        valor = valor.substring(0, 11);
+function obterNumerosTelefone(tel) {
+    return tel.replace(/\D/g, '');
+}
+
+function validarEmail(email, max = 60) {
+    let regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email) && email.length <= max;
+}
+
+function validarNome(nome, max = 50) {
+    return nome.length >= 3 && nome.length <= max && /^[a-zA-ZÀ-ÿ\s]+$/.test(nome);
+}
+
+function validarSenha(senha, obrigatoria = true) {
+    if (!senha && !obrigatoria) return true;
+    return senha.length >= 8 && senha.length <= 50;
+}
+
+function validarTelefone(telefone) {
+    let n = obterNumerosTelefone(telefone);
+    return n.length >= 10 && n.length <= 11;
+}
+
+function validarCampo(campo, tipo) {
+    let v = campo.value.trim(), msg = "";
+    let l = v.length;
+
+    switch (tipo) {
+        case "nome": msg = !validarNome(v) ? "Nome inválido" : ""; break;
+        case "email": msg = !validarEmail(v) ? "E-mail inválido" : ""; break;
+        case "senha": msg = !validarSenha(v) ? "Senha inválida" : ""; break;
+        case "nome_fornecedor": msg = l < 3 || l > 100 ? "Nome do fornecedor inválido" : ""; break;
+        case "endereco": msg = l < 5 || l > 255 ? "Endereço inválido" : ""; break;
+        case "telefone": msg = !validarTelefone(v) ? "Telefone inválido" : ""; break;
+        case "contato": msg = l < 3 || l > 100 ? "Contato inválido" : ""; break;
     }
-    
-    // Aplica a máscara
-    if (valor.length <= 11) {
-        if (valor.length <= 2) {
-            input.value = valor;
-        } else if (valor.length <= 6) {
-            input.value = valor.replace(/(\d{2})(\d)/, '($1) $2');
-        } else if (valor.length <= 10) {
-            input.value = valor.replace(/(\d{2})(\d{4})(\d)/, '($1) $2-$3');
-        } else {
-            input.value = valor.replace(/(\d{2})(\d{5})(\d)/, '($1) $2-$3');
-        }
+
+    campo.classList.remove('is-invalid', 'is-valid');
+    let erro = campo.parentNode.querySelector('.erro-validacao');
+    if (erro) erro.remove();
+
+    if (msg) {
+        let span = document.createElement('span');
+        span.className = 'erro-validacao text-danger small';
+        span.textContent = msg;
+        campo.parentNode.appendChild(span);
+        campo.classList.add('is-invalid');
+    } else {
+        campo.classList.add('is-valid');
     }
 }
 
-// Função para obter apenas os números do telefone (para validação)
-function obterNumerosTelefone(telefone) {
-    return telefone.replace(/\D/g, '');
+function validarUsuario(alt = false) {
+    let nome = document.getElementById("nome").value.trim();
+    let email = document.getElementById("email").value.trim();
+    let senha = document.getElementById(alt ? "nova_senha" : "senha")?.value || "";
+    let perfil = document.getElementById("id_perfil").value;
+
+    if (!validarNome(nome)) return alert("Nome inválido"), document.getElementById("nome").focus(), false;
+    if (!validarEmail(email)) return alert("E-mail inválido"), document.getElementById("email").focus(), false;
+    if (!validarSenha(senha, !alt)) return alert("Senha inválida"), document.getElementById(alt ? "nova_senha" : "senha").focus(), false;
+    if (!perfil || perfil == "0") return alert("Selecione um perfil válido"), document.getElementById("id_perfil").focus(), false;
+
+    return true;
 }
 
 function validarFuncionario() {
@@ -56,385 +75,34 @@ function validarFuncionario() {
     let telefone = document.getElementById("telefone").value;
     let email = document.getElementById("email").value;
 
-    if (nome.length < 3) {
-        alert("O nome do funcionário deve ter pelo menos 3 caracteres.");
-        return false;
-    }
-
-    let numerosTelefone = obterNumerosTelefone(telefone);
-    if (numerosTelefone.length < 10 || numerosTelefone.length > 11) {
-        alert("Digite um telefone válido (DDD + número, total de 10 ou 11 dígitos).");
-        return false;
-    }
-
-    let regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!regexEmail.test(email)) {
-        alert("Digite um e-mail válido.");
-        return false;
-    }
+    if (!validarNome(nome)) return alert("Nome do funcionário inválido"), false;
+    if (!validarTelefone(telefone)) return alert("Telefone inválido"), false;
+    if (!validarEmail(email)) return alert("E-mail inválido"), false;
 
     return true;
 }
 
-function validarUsuario() {
-    let nome = document.getElementById("nome").value.trim();
-    let email = document.getElementById("email").value.trim();
-    let senha = document.getElementById("senha").value;
-    let id_perfil = document.getElementById("id_perfil").value;
-
-
-    if (nome.length < 3) {
-        alert("O nome deve ter pelo menos 3 caracteres.");
-        document.getElementById("nome").focus();
-        return false;
-    }
-
-    if (nome.length > 50) {
-        alert("O nome deve ter no máximo 50 caracteres.");
-        document.getElementById("nome").focus();
-        return false;
-    }
-
-    let regexNome = /^[a-zA-ZÀ-ÿ\s]+$/;
-    if (!regexNome.test(nome)) {
-        alert("O nome não pode conter números ou caracteres especiais.");
-        document.getElementById("nome").focus();
-        return false;
-    }
-
-    let regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!regexEmail.test(email)) {
-        alert("Digite um e-mail válido.");
-        document.getElementById("email").focus();
-        return false;
-    }
-
-    if (email.length > 60) {
-        alert("O e-mail deve ter no máximo 60 caracteres.");
-        document.getElementById("email").focus();
-        return false;
-    }
-
-    if (senha.length < 8) {
-        alert("A senha deve ter pelo menos 8 caracteres.");
-        document.getElementById("senha").focus();
-        return false;
-    }
-
-    if (senha.length > 50) {
-        alert("A senha deve ter no máximo 50 caracteres.");
-        document.getElementById("senha").focus();
-        return false;
-    }
-
-    if (id_perfil === "" || id_perfil === "0") {
-        alert("Selecione um perfil válido.");
-        document.getElementById("id_perfil").focus();
-        return false;
-    }
-
-    return true;
-}
-
-function validarAlteracaoUsuario() {
-    let nome = document.getElementById("nome").value.trim();
-    let email = document.getElementById("email").value.trim();
-    let id_perfil = document.getElementById("id_perfil").value;
-    let nova_senha = document.getElementById("nova_senha");
-
-
-    if (nome.length < 3) {
-        alert("O nome deve ter pelo menos 3 caracteres.");
-        document.getElementById("nome").focus();
-        return false;
-    }
-
-    if (nome.length > 50) {
-        alert("O nome deve ter no máximo 50 caracteres.");
-        document.getElementById("nome").focus();
-        return false;
-    }
-
-
-    let regexNome = /^[a-zA-ZÀ-ÿ\s]+$/;
-    if (!regexNome.test(nome)) {
-        alert("O nome não pode conter números ou caracteres especiais.");
-        document.getElementById("nome").focus();
-        return false;
-    }
-
-
-    let regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!regexEmail.test(email)) {
-        alert("Digite um e-mail válido.");
-        document.getElementById("email").focus();
-        return false;
-    }
-
-    if (email.length > 60) {
-        alert("O e-mail deve ter no máximo 60 caracteres.");
-        document.getElementById("email").focus();
-        return false;
-    }
-
-
-    if (id_perfil === "" || id_perfil === "0") {
-        alert("Selecione um perfil válido.");
-        document.getElementById("id_perfil").focus();
-        return false;
-    }
-
-
-    if (nova_senha && nova_senha.value !== "") {
-        if (nova_senha.value.length < 8) {
-            alert("A nova senha deve ter pelo menos 8 caracteres.");
-            nova_senha.focus();
-            return false;
-        }
-
-        if (nova_senha.value.length > 50) {
-            alert("A nova senha deve ter no máximo 50 caracteres.");
-            nova_senha.focus();
-            return false;
-        }
-    }
-
-    return true;
-}
-
-function validarCampo(campo, tipo) {
-    let valor = campo.value.trim();
-    let mensagem = "";
-
-    switch(tipo) {
-        case "nome":
-            if (valor.length < 3) {
-                mensagem = "Nome deve ter pelo menos 3 caracteres";
-            } else if (valor.length > 50) {
-                mensagem = "Nome deve ter no máximo 50 caracteres";
-            } else {
-                let regexNome = /^[a-zA-ZÀ-ÿ\s]+$/;
-                if (!regexNome.test(valor)) {
-                    mensagem = "Nome não pode conter números ou caracteres especiais";
-                }
-            }
-            break;
-        
-        case "email":
-            let regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!regexEmail.test(valor)) {
-                mensagem = "Digite um e-mail válido";
-            } else if (valor.length > 60) {
-                mensagem = "E-mail deve ter no máximo 60 caracteres";
-            }
-            break;
-        
-        case "senha":
-            if (valor.length < 8) {
-                mensagem = "Senha deve ter pelo menos 8 caracteres";
-            } else if (valor.length > 50) {
-                mensagem = "Senha deve ter no máximo 50 caracteres";
-            }
-            break;
-        
-        case "nome_fornecedor":
-            if (valor.length < 3) {
-                mensagem = "Nome do fornecedor deve ter pelo menos 3 caracteres";
-            } else if (valor.length > 100) {
-                mensagem = "Nome do fornecedor deve ter no máximo 100 caracteres";
-            }
-            break;
-        
-        case "endereco":
-            if (valor.length < 5) {
-                mensagem = "Endereço deve ter pelo menos 5 caracteres";
-            } else if (valor.length > 255) {
-                mensagem = "Endereço deve ter no máximo 255 caracteres";
-            }
-            break;
-        
-        case "telefone":
-            let numerosTelefone = obterNumerosTelefone(valor);
-            if (numerosTelefone.length < 10) {
-                mensagem = "Telefone deve ter pelo menos 10 dígitos (DDD + número)";
-            } else if (numerosTelefone.length > 11) {
-                mensagem = "Telefone deve ter no máximo 11 dígitos (DDD + 9 dígitos)";
-            }
-            break;
-        
-        case "contato":
-            if (valor.length < 3) {
-                mensagem = "Contato deve ter pelo menos 3 caracteres";
-            } else if (valor.length > 100) {
-                mensagem = "Contato deve ter no máximo 100 caracteres";
-            }
-            break;
-    }
-
-
-    let erroAnterior = campo.parentNode.querySelector('.erro-validacao');
-    if (erroAnterior) {
-        erroAnterior.remove();
-    }
-
-   
-    if (mensagem) {
-        let spanErro = document.createElement('span');
-        spanErro.className = 'erro-validacao text-danger small';
-        spanErro.textContent = mensagem;
-        campo.parentNode.appendChild(spanErro);
-        campo.classList.add('is-invalid');
-    } else {
-        campo.classList.remove('is-invalid');
-        campo.classList.add('is-valid');
-    }
-}
-
-function validarFornecedor() {
-    let nome_fornecedor = document.getElementById("nome_fornecedor").value.trim();
+function validarFornecedor(alt = false) {
+    let nome = document.getElementById("nome_fornecedor").value.trim();
     let endereco = document.getElementById("endereco").value.trim();
     let telefone = document.getElementById("telefone").value.trim();
     let email = document.getElementById("email").value.trim();
     let contato = document.getElementById("contato").value.trim();
 
-    if (nome_fornecedor.length < 3) {
-        alert("O nome do fornecedor deve ter pelo menos 3 caracteres.");
-        document.getElementById("nome_fornecedor").focus();
-        return false;
-    }
+    if (nome.length < 3 || nome.length > 100)
+        return alert("Nome do fornecedor inválido"), document.getElementById("nome_fornecedor").focus(), false;
 
-    if (nome_fornecedor.length > 100) {
-        alert("O nome do fornecedor deve ter no máximo 100 caracteres.");
-        document.getElementById("nome_fornecedor").focus();
-        return false;
-    }
+    if (endereco.length < 5 || endereco.length > 255)
+        return alert("Endereço inválido"), document.getElementById("endereco").focus(), false;
 
-    if (endereco.length < 5) {
-        alert("O endereço deve ter pelo menos 5 caracteres.");
-        document.getElementById("endereco").focus();
-        return false;
-    }
+    if (!validarTelefone(telefone))
+        return alert("Telefone inválido"), document.getElementById("telefone").focus(), false;
 
-    if (endereco.length > 255) {
-        alert("O endereço deve ter no máximo 255 caracteres.");
-        document.getElementById("endereco").focus();
-        return false;
-    }
+    if (!validarEmail(email, 100))
+        return alert("E-mail inválido"), document.getElementById("email").focus(), false;
 
-    let numerosTelefone = obterNumerosTelefone(telefone);
-    if (numerosTelefone.length < 10) {
-        alert("O telefone deve ter pelo menos 10 dígitos (DDD + número).");
-        document.getElementById("telefone").focus();
-        return false;
-    }
-
-    if (numerosTelefone.length > 11) {
-        alert("O telefone deve ter no máximo 11 dígitos (DDD + 9 dígitos).");
-        document.getElementById("telefone").focus();
-        return false;
-    }
-
-    let regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!regexEmail.test(email)) {
-        alert("Digite um e-mail válido.");
-        document.getElementById("email").focus();
-        return false;
-    }
-
-    if (email.length > 100) {
-        alert("O e-mail deve ter no máximo 100 caracteres.");
-        document.getElementById("email").focus();
-        return false;
-    }
-
-   
-    if (contato.length < 3) {
-        alert("O contato deve ter pelo menos 3 caracteres.");
-        document.getElementById("contato").focus();
-        return false;
-    }
-
-    if (contato.length > 100) {
-        alert("O contato deve ter no máximo 100 caracteres.");
-        document.getElementById("contato").focus();
-        return false;
-    }
-
-    return true;
-}
-
-function validarAlteracaoFornecedor() {
-    let nome_fornecedor = document.getElementById("nome_fornecedor").value.trim();
-    let endereco = document.getElementById("endereco").value.trim();
-    let telefone = document.getElementById("telefone").value.trim();
-    let email = document.getElementById("email").value.trim();
-    let contato = document.getElementById("contato").value.trim();
-
-    
-    if (nome_fornecedor.length < 3) {
-        alert("O nome do fornecedor deve ter pelo menos 3 caracteres.");
-        document.getElementById("nome_fornecedor").focus();
-        return false;
-    }
-
-    if (nome_fornecedor.length > 100) {
-        alert("O nome do fornecedor deve ter no máximo 100 caracteres.");
-        document.getElementById("nome_fornecedor").focus();
-        return false;
-    }
-
-
-    if (endereco.length < 5) {
-        alert("O endereço deve ter pelo menos 5 caracteres.");
-        document.getElementById("endereco").focus();
-        return false;
-    }
-
-    if (endereco.length > 255) {
-        alert("O endereço deve ter no máximo 255 caracteres.");
-        document.getElementById("endereco").focus();
-        return false;
-    }
-
-
-    let numerosTelefone = obterNumerosTelefone(telefone);
-    if (numerosTelefone.length < 10) {
-        alert("O telefone deve ter pelo menos 10 dígitos (DDD + número).");
-        document.getElementById("telefone").focus();
-        return false;
-    }
-
-    if (numerosTelefone.length > 11) {
-        alert("O telefone deve ter no máximo 11 dígitos (DDD + 9 dígitos).");
-        document.getElementById("telefone").focus();
-        return false;
-    }
-
- 
-    let regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!regexEmail.test(email)) {
-        alert("Digite um e-mail válido.");
-        document.getElementById("email").focus();
-        return false;
-    }
-
-    if (email.length > 100) {
-        alert("O e-mail deve ter no máximo 100 caracteres.");
-        document.getElementById("email").focus();
-        return false;
-    }
-
-    if (contato.length < 3) {
-        alert("O contato deve ter pelo menos 3 caracteres.");
-        document.getElementById("contato").focus();
-        return false;
-    }
-
-    if (contato.length > 100) {
-        alert("O contato deve ter no máximo 100 caracteres.");
-        document.getElementById("contato").focus();
-        return false;
-    }
+    if (contato.length < 3 || contato.length > 100)
+        return alert("Contato inválido"), document.getElementById("contato").focus(), false;
 
     return true;
 }
