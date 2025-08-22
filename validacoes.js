@@ -41,6 +41,18 @@ function validarCampo(campo, tipo) {
         case "contato": msg = l < 3 || l > 100 ? "Contato inválido" : ""; break;
     }
 
+    const input= document.getElementById("telefone");
+
+    input.addEventListener('input', function(e){
+        let value = e.target.value.replace(/\D/g,"");
+        if (value.length > 11) value = value.slice(0,11);
+        if (value.length <=10){
+            e.target.value = value.replace(/(\d{2}) (\d{4}) (\d{0,4})/, "($1) $2-$3") 
+        } else {
+            e.target.value = value.replace(/(\d{2}) (\d{4}) (\d{0,4})/, "($1) $2-$3");
+        }
+    });
+
     campo.classList.remove('is-invalid', 'is-valid');
     let erro = campo.parentNode.querySelector('.erro-validacao');
     if (erro) erro.remove();
